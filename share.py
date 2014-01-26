@@ -268,7 +268,7 @@ class FiniteFieldByteSecret(object):
             print repr(unpadded), repr(msg_sub)
             decoded_len += len(msg_sub)
             msg.append(msg_sub)
-        return (''.join(msg))[:msg_len]
+        return (''.join(msg))
 
 if __name__=='__main__':
     msg = "Hello, world! Everything nice and wobbly?"
