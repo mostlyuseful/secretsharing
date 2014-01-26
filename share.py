@@ -265,7 +265,6 @@ class FiniteFieldByteSecret(object):
             # Check if last block, then pad only up to rest length
             unpadded = dec_to_str(D_sub)
             msg_sub = pad(unpadded, min(msg_len-decoded_len, share_length))
-            print repr(unpadded), repr(msg_sub)
             decoded_len += len(msg_sub)
             msg.append(msg_sub)
         return (''.join(msg))
