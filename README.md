@@ -9,6 +9,6 @@ There are three methods:
   - Sharing a secret (a natural number in the set N_0) in the finite field resulting in big integer coefficients
   - Sharing a secret string split into smaller chunks resulting in coefficients of controllable sizes
 
-To reconstruct the underlying formula Lagrange polynomials are used in an O^2 implementation.
+To reconstruct the underlying formula Lagrange polynomials are used in an O<sup>2</sup> implementation.
 
 This implementation is mostly done to easily follow the general idea, it is not optimized for speed.
