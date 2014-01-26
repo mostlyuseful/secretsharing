@@ -45,7 +45,8 @@ def generate_prime_bigger_than(x):
 def str_to_dec(s):
     d = 0
     for i,c in enumerate(s):
-        d += ord(c) * 256**(len(s)-i-1)
+        # Add one to safe-guard against D being zero (which cannot be expressed correctly)
+        d += (ord(c)+1) * 257**(len(s)-i-1)
     return d
 
 def dec_to_str(x):
@@ -54,15 +55,15 @@ def dec_to_str(x):
     i = 100
     
     if x > 0:
-        i = int(np.ceil(np.log10(float(x))/np.log10(256)))+1
+        i = int(np.ceil(np.log10(float(x))/np.log10(257)))+1
     else:
         return ''
-    while x//256**i == 0:
+    while x//257**i == 0:
         i -= 1
     
     while running > 0:
-        q, r = divmod(running, 256**i)
-        l.append(chr(int(q)))
+        q, r = divmod(running, 257**i)
+        l.append(chr(int(q-1)))
         running = r
         i -= 1
     return "".join(l)
@@ -252,15 +253,20 @@ class FiniteFieldByteSecret(object):
         def pad(s, min_len):
             if len(s) >= min_len:
                 return s
-            return s+(min_len-len(s))*'\0'
+            return (min_len-len(s))*'\0'+s
         
         msg = []
         sub_share_count = len(shares[0])
         participant_count = len(shares)
+        decoded_len = 0
         for share_idx in range(sub_share_count):
             sub_shares = [ shares[participant][share_idx] for participant in range(participant_count) ]
             D_sub = FiniteFieldSecret.join(P, sub_shares)
-            msg_sub = pad(dec_to_str(D_sub), share_length)
+            # Check if last block, then pad only up to rest length
+            unpadded = dec_to_str(D_sub)
+            msg_sub = pad(unpadded, min(msg_len-decoded_len, share_length))
+            print repr(unpadded), repr(msg_sub)
+            decoded_len += len(msg_sub)
             msg.append(msg_sub)
         return (''.join(msg))[:msg_len]
 
@@ -271,7 +277,8 @@ if __name__=='__main__':
     P, shares = FiniteFieldSecret.share(str_to_dec(msg),3,60)
     assert FiniteFieldSecret.join(P, shares) == str_to_dec(msg)
     
-    share_len, P2, msg_len, shares2 = FiniteFieldByteSecret.share_small(msg, 3, 5, 2)
+    share_len, P2, msg_len, shares2 = FiniteFieldByteSecret.share_small(msg, 3, 5, 1)
     msg_decoded = FiniteFieldByteSecret.join_small(share_len, P2, msg_len, shares2)
     print repr(msg_decoded)
     assert msg_decoded == msg
+    

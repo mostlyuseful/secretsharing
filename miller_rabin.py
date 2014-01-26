@@ -111,4 +111,3 @@ def is_probable_prime(n, k=10):
     return True
 
 PRIME_TABLE = [2, 3] + [x for x in range(5, 1000, 2) if is_probable_prime(x)]
-
